@@ -8,6 +8,6 @@ A tool to help find the optimal line to move in for TASing lego batman 1 but sho
 
 - Run main.py
 
-## How to use
+## How to Use
 
 I'll put stuff here when I feel like it.
