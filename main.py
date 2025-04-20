@@ -5,21 +5,39 @@ from tkinter import *
 window = Tk()
 window.title("Dolphin Line Calculator")
 
-Label(window, text="Player 1").grid(row=0, column=0, sticky=W, padx=10)
 
-Label(window, text="Position:").grid(row=1, column=0, sticky=W, padx=10)
+unhooked = Frame(window)
+Label(unhooked, text="Please run dolphin emulator...").grid(row=0, column=0, sticky=W, padx=10)
 
-player1PosLabel = Label(window)
+
+info = Frame(window)
+
+Label(info, text="Player 1").grid(row=0, column=0, sticky=W, padx=10)
+
+Label(info, text="Position:").grid(row=1, column=0, sticky=W, padx=10)
+
+player1PosLabel = Label(info)
 player1PosLabel.grid(row=1, column=1, sticky=W, padx=10)
 
-Label(window, text="Nunchuck input:").grid(row=2, column=0, sticky=W, padx=10)
+Label(info, text="Nunchuck input:").grid(row=2, column=0, sticky=W, padx=10)
 
-sugestedInput = Label(window)
-sugestedInput.grid(row=2, column=1, sticky=W, padx=10)
+suggestedInputP1 = Label(info)
+suggestedInputP1.grid(row=2, column=1, sticky=W, padx=10)
 
-dolphin.hook()
 
-inputAngle = 0
+def calculate_input_angle(camera_offset, angle):
+    input_rads = angle - camera_offset - (math.pi / 2)
+    return round(127 * math.cos(input_rads)) + 128, round(127 * math.sin(input_rads)) + 128
+
+
+unhooked.pack()
+
+while not dolphin.is_hooked():
+    dolphin.hook()
+    window.update()
+
+unhooked.pack_forget()
+info.pack()
 
 while dolphin.is_hooked():
 
@@ -31,18 +49,12 @@ while dolphin.is_hooked():
 
     sinYaw = dolphin.read_float(2151539448)
     cosYaw = dolphin.read_float(2151539480)
+    yaw = math.atan2(sinYaw, -cosYaw)
 
-    yawRad = math.atan2(sinYaw, -cosYaw)
+    angleToTarget1 = math.atan2(-(target1z - player1z), -(target1x - player1x))
 
-    destinationAngle = math.atan2(-(target1z - player1z), -(target1x - player1x))
-
-    inputRads = destinationAngle - yawRad - (math.pi/2)
-
-    oldInputAngle = inputAngle
-    inputAngle = round(127*math.cos(inputRads))+128, round(127*math.sin(inputRads))+128
-
-    sugestedInput['text'] = str(inputAngle)
-    player1PosLabel['text'] = ('%.4f' % player1x)+" "+('%.4f' % player1z)
+    player1PosLabel['text'] = ('%.4f' % player1x) + " " + ('%.4f' % player1z)
+    suggestedInputP1['text'] = str(calculate_input_angle(yaw, angleToTarget1))
     window.update()
 
 
