@@ -1,15 +1,16 @@
 import dolphin_memory_engine as dolphin
 import math
 from tkinter import *
+import json
 
 window = Tk()
 window.title("Dolphin Line Calculator")
 window.resizable(False, False)
 
 
-unhookedFrame = Frame(window, width=400, height=300)
+unhookedFrame = Frame(window, width=400, height=180)
 Label(unhookedFrame, text="Please run dolphin emulator...").grid(row=0, column=0, sticky=W, padx=10)
-
+unhookedFrame.grid_propagate(0)
 
 infoFrame = Frame(window)
 
@@ -89,12 +90,15 @@ def calculate_input_angle(camera_offset, angle):
     input_rads = angle - camera_offset - (math.pi / 2)
     return round(127 * math.cos(input_rads)) + 128, round(127 * math.sin(input_rads)) + 128
 
-player1xAddress = 2419802108
-player1zAddress = 2419802116
-player2xAddress = 2419807996
-player2zAddress = 2419808004
-sinYawAddress = 2151539448
-cosYawAddress = 2151539480
+with open('addresses.json', 'r') as file:
+    addressDict = json.load(file)
+
+player1xAddress = addressDict["player1x"]
+player1zAddress = addressDict["player1z"]
+player2xAddress = addressDict["player2x"]
+player2zAddress = addressDict["player2z"]
+sinYawAddress = addressDict["sinYaw"]
+cosYawAddress = addressDict["cosYaw"]
 
 player1x = 0.0
 player1z = 0.0
